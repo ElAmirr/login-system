@@ -1,0 +1,23 @@
+{
+  "name": "login-system",
+  "version": "1.0.0",
+  "description": "login-system",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ElAmirr/login-system.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ElAmirr/login-system/issues"
+  },
+  "homepage": "https://github.com/ElAmirr/login-system#readme",
+  "dependencies": {
+    "sqlite3": "^5.1.7"
+  }
+}
