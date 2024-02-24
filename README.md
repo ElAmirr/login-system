@@ -11,6 +11,7 @@ This is a basic login system application built with pure Node.js for the backend
 - [API Endpoints](#api-endpoints)
 - [Contributing](#contributing)
 - [License](#license)
+-[Screen Shot](#screen-shot)
 
 ## Features
 
@@ -48,3 +49,6 @@ Feel free to contribute to the project. Open issues and pull requests are welcom
 ## License
 
 This project is licensed under the MIT License
+
+## Screen Shot
+[alt img]
