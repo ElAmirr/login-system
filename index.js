@@ -1,92 +1,63 @@
-const http = require('http');
-const url = require('url');
-const path = require('path');
-const fs = require('fs');
-const { setupDatabase } = require('./dbSetup');
+const express = require('express');
 const sqlite3 = require('sqlite3');
-const databasePath = './mydatabase.db';
+const bodyParser = require('body-parser');
+const bcrypt = require('bcrypt');
 
-setupDatabase();
-
-const server = http.createServer((req, res) => {
-    const reqUrl = url.parse(req.url, true);
-
-    if (reqUrl.pathname === '/') {
-        // serve the login page
-        const loginPath = path.join(__dirname, 'public', 'login.html');
-        fs.readFile(loginPath, 'utf8', (err, data) => {
-            if (err) {
-                res.writeHead(500, { 'Content-Type': 'text/plain' });
-                res.end('Internal Server Error');
-            } else {
-                res.writeHead(200, { 'Content-Type': 'text/html' });
-                res.end(data);
-            }
-        });
-    } else if (reqUrl.pathname === '/login' && req.method === 'POST') {
-        // Handle login form submission
-        let body = '';
-        req.on('data', chunk => {
-            body += chunk.toString();
-        });
-
-        req.on('end', () => {
-            const formData = new URLSearchParams(body);
-            const username = formData.get('username');
-            const email = formData.get('email');
-            const password = formData.get('password');
-
-            const db = new sqlite3.Database(databasePath);
-            const insertQuery = db.prepare('INSERT INTO users (username, email, password) VALUES (?, ?, ?)');
-
-            // Simulate user validation
-            // Simulate user validation
-const columnName = 'email';
-const selectQuery = `SELECT ${columnName} FROM users`;
-db.all(selectQuery, (err, rows) => {
-    if (err) {
-        console.error(err.message);
-    } else {
-        let loginSuccessful = false;
-
-        rows.forEach(row => {
-            const data = row[columnName];
-            if (email === data) {
-                loginSuccessful = true;
-            }
-        });
-
-        if (loginSuccessful) {
-            res.writeHead(200, { 'Content-Type': 'text/plain' });
-            res.end('Login successful');
-            insertQuery.run(username, email, password, err => {
-                if (err) {
-                    console.error(err.message);
-                } else {
-                    res.writeHead(201, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ message: 'Item added successfully' }));
-                }
-            });
-        } else {
-            res.writeHead(401, { 'Content-Type': 'text/plain' });
-            res.end('Invalid Credentials');
-        }
-
-        
-    }
-});
-// Move db.close() outside of rows.forEach
-db.close();
-
-        });
-    } else {
-        // Serve 404 page for other routes
-        res.writeHead(404, { 'Content-Type': 'text/plain' });
-        res.end('Not Found');
-    }
-});
-
+const app = express();
 const port = 3000;
-server.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+
+// Middleware
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static('public')); // for serving HTML and CSS files
+
+// SQLite Database
+const db = new sqlite3.Database('database.db');
+
+// Create users table if not exists
+db.run(`
+  CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT UNIQUE,
+    password TEXT
+  )
+`);
+
+// Insert initial user (admin/admin) into the database
+const hashedPassword = bcrypt.hashSync('admin', 10);
+db.run('INSERT OR IGNORE INTO users (username, password) VALUES (?, ?)', ['admin', hashedPassword]);
+
+// Routes
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/public/index.html');
+});
+
+app.post('/login', (req, res) => {
+  const { username, password } = req.body;
+
+  // Retrieve user from the database
+  db.get('SELECT * FROM users WHERE username = ?', [username], (err, row) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send('Internal Server Error');
+    } else if (row) {
+      // Compare hashed password
+      bcrypt.compare(password, row.password, (err, result) => {
+        if (err) {
+          console.error(err);
+          res.status(500).send('Internal Server Error');
+        } else if (result) {
+          res.send('Login successful!');
+        } else {
+          res.send('Invalid username or password');
+        }
+      });
+    } else {
+      res.send('Invalid username or password');
+    }
+  });
+});
+
+// Start the server
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
 });
