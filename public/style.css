@@ -10,8 +10,11 @@
 }
 
 .img {
-    background-image: url(bg-1.jpg);
-    object-fit: cover;
+    height: 150px;
+    background-image: url("bg-1.jpg");
+    background-repeat:no-repeat;
+    background-size: cover;
+
 }
 
 .wrap {
@@ -19,6 +22,16 @@
     background-color: #fff;
     border-radius: 5px;
     box-shadow: 0px 10px 34px -15px rgba(0, 0, 0, 0.24);
+}
+
+.social-media a{
+    all: unset;
+    height: 40px;
+    width: 40px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 50%;
+    margin-right: 5px;
+    opacity: 0.6;
 }
 
 .btn {
@@ -33,4 +46,41 @@
     background-color: #01d28e !important;
     color: #fff;
     border: 1px solid #01d28e !important;
+}
+
+.login, .password {
+    position: relative;
+}
+
+.login-label {
+    position: absolute;
+    top: 7px;
+    left: 14px;
+    opacity: 0.6;
+}
+
+.password-label {
+    position: absolute;
+    top: 7px;
+    left: 14px;
+    opacity: 0.6;
+}
+
+.toggle-password {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    opacity: 0.6;
+}
+
+a {
+    all: unset;
+}
+
+.checkbox-primary, .text-center a {
+    color: #01d28e;
+} 
+
+.w-50 a , p.text-center {
+    opacity: 0.6;
 }
