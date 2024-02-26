@@ -4,7 +4,7 @@
   "description": "login-system",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "devStart": "nodemon index.js"
   },
   "repository": {
     "type": "git",
@@ -19,7 +19,12 @@
   "homepage": "https://github.com/ElAmirr/login-system#readme",
   "dependencies": {
     "bcrypt": "^5.1.1",
+    "ejs": "^3.1.9",
     "express": "^4.18.2",
     "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "dotenv": "^16.4.5",
+    "nodemon": "^3.1.0"
   }
 }
