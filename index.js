@@ -23,7 +23,7 @@ db.run(`
 `);
 
 // Routes
-app.get('/login', (req, res) => {
+app.get('/', (req, res) => {
   res.sendFile(__dirname + '/public/login.html');
 });
 
