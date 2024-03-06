@@ -38,9 +38,27 @@ app.post('/signup', (req, res) => {
   db.get('SELECT * FROM users WHERE username = ?', [username], (err, row) => {
     if (err) {
       console.error(err);
-      res.status(500).send('Internal Server Error');
+      res.status(500).json({ error: 'Internal Server Error' });
     } else if (row) {
-      res.send('Username already exists. Please choose a different username.');
+      res.status(400).json({ error: 'Username already exists. Please choose a different username.' });
+    } else if (username.length < 3) {
+      res.status(400).json({ error: 'Username must be at least 3 characters long.' });
+    } else if (password.length < 6) {
+      res.status(400).json({ error: 'Password must be at least 6 characters long.' });
+    } else if (password !== req.body.confirmPassword) {
+      res.status(400).json({ error: 'Passwords do not match.' });
+    } else if (!/^[a-zA-Z0-9]+$/.test(username)) {
+      res.status(400).json({ error: 'Username must contain only letters and numbers.' });
+    } else if (!/^[a-zA-Z0-9]+$/.test(password)) {
+      res.status(400).json({ error: 'Password must contain only letters and numbers.' });
+    } else if (username === password) {
+      res.status(400).json({ error: 'Username and password must be different.' });
+    } else if (username.toLowerCase() === 'admin') {
+      res.status(400).json({ error: 'Username cannot be "admin".' });
+    } else if (password.toLowerCase() === 'password') {
+      res.status(400).json({ error: 'Password cannot be "password".' });
+    } else if (password.toLowerCase() === '123456') {
+      res.status(400).json({ error: 'Password cannot be "123456".' });
     } else {
       // Hash the password before storing it in the database
       const hashedPassword = bcrypt.hashSync(password, 10);
@@ -49,9 +67,9 @@ app.post('/signup', (req, res) => {
       db.run('INSERT INTO users (username, password) VALUES (?, ?)', [username, hashedPassword], (err) => {
         if (err) {
           console.error(err);
-          res.status(500).send('Internal Server Error');
+          res.status(500).json({ error: 'Internal Server Error' });
         } else {
-          res.send('Registration successful! You can now log in.');
+          res.json({ message: 'Registration successful! You can now log in.' });
         }
       });
     }
@@ -65,21 +83,21 @@ app.post('/login', (req, res) => {
   db.get('SELECT * FROM users WHERE username = ?', [username], (err, row) => {
     if (err) {
       console.error(err);
-      res.status(500).send('Internal Server Error');
+      res.status(500).json({ error: 'Internal Server Error' });
     } else if (row) {
       // Compare hashed password
       bcrypt.compare(password, row.password, (err, result) => {
         if (err) {
           console.error(err);
-          res.status(500).send('Internal Server Error');
+          res.status(500).json({ error: 'Internal Server Error' });
         } else if (result) {
-          res.send('Login successful!');
+          res.json({ message: 'Login successful!' });
         } else {
-          res.send('Invalid username or password');
+          res.status(400).json({ error: 'Invalid username or password' });
         }
       });
     } else {
-      res.send('Invalid username or password');
+      res.status(400).json({ error: 'Invalid username or password' });
     }
   });
 });
